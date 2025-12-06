@@ -15,7 +15,8 @@ const postSchema = new mongoose.Schema({
     summary: String,
     details: String,
     folow_ups: [{ type: String, ref: "FollowupModel" }],
-    timestamp: Date
+    timestamp: Date,
+    read_by: [{ type: String, ref: "UserModel" }]
 },
     { collection: "posts" }
 );
