@@ -7,6 +7,8 @@ const postSchema = new mongoose.Schema({
         enum: ["QUESTION", "NOTE", "POLL"],
         default: "QUESTION",
     },
+    read_by: [{ type: String, ref: "UserModel" }],
+    answer:[{type:String,ref:"AnswerModel"}],
     is_private: Boolean,
     is_anonymous: Boolean,
     course: { type: String, ref: "CourseModel" },
@@ -14,9 +16,8 @@ const postSchema = new mongoose.Schema({
     folder: { type: String, ref: "FolderModel" },
     summary: String,
     details: String,
-    folow_ups: [{ type: String, ref: "FollowupModel" }],
-    timestamp: Date,
-    read_by: [{ type: String, ref: "UserModel" }]
+    follow_ups: [{ type: String, ref: "FollowupModel" }],
+    timestamp: Date
 },
     { collection: "posts" }
 );
