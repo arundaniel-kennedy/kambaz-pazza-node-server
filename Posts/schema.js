@@ -21,4 +21,3 @@ const postSchema = new mongoose.Schema({
     { collection: "posts" }
 );
 export default postSchema;
-
