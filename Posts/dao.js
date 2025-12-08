@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import model from "./model.js";
+import UserModel from "../../Kambaz/Users/model.js";
 export default function PostsDao() {
   async function getAllPostsForCourse(courseId) {
     return await model.find({ course: courseId });
@@ -124,6 +125,78 @@ export default function PostsDao() {
     return model.deleteOne({ _id: postId });
   }
 
+  //edit a post
+  function editPost(postId, postUpdates) {
+    return model.updateOne({ _id: postId }, { $set: postUpdates });
+  }
+  //get post
+  function getPost(postId) {
+    return model
+      .findById(postId)
+      .populate("author")
+      .populate("answer")
+      .populate("folder");
+  }
+
+  //record a view
+  async function readPost(postId, userId) {
+    const post = await model.findById(postId).populate("read_by");
+    const alreadyRead = post.read_by.some((user) => user._id === userId);
+    const user = UserModel.findById(userId);
+    if (!alreadyRead) {
+      post.read_by.push(user);
+      await post.save();
+    }
+    return {
+      views: post.read_by.length,
+      alreadyRead,
+    };
+  }
+
+  //replies
+  async function createReplyToFollowup(postId, followupId, userId, reply) {
+    const post = await model.findById(postId);
+    const followup = post.follow_ups.id(followupId);
+    if (!followup) throw new Error("Followup not found");
+    const newReply = { ...reply, _id: uuidv4(), author: userId };
+    followup.replies.push(newReply);
+
+    await post.save();
+
+    return newReply;
+  }
+  //create a reply to reply
+  async function createReplyToReply(
+    postId,
+    followupId,
+    replyId,
+    userId,
+    newReply
+  ) {
+    const post = await model.findById(postId);
+    if (!post) throw new Error("Post not found");
+    const followup = post.follow_ups.id(followupId);
+    if (!followup) throw new Error("Followup not found");
+
+    const reply = followup.replies.id(replyId);
+    if (!reply) throw new Error("Reply not found");
+
+    const newReplyWithId = { ...newReply, _id: uuidv4(), author: userId };
+    reply.replies.push(newReplyWithId);
+
+    await post.save();
+
+    return newReplyWithId;
+  }
+  //followup
+  async function createFollowupToPost(postId,userId, followup) {
+    const post = await model.findById(postId);
+    const newFollowup = { ...followup, _id: uuidv4(),author:userId };
+    post.follow_ups.push(newFollowup);
+    await post.save();
+    return newFollowup;
+  }
+
   return {
     findAllPostsNameDesc,
     createPost,
@@ -134,5 +207,11 @@ export default function PostsDao() {
     getLastWeekPosts,
     getYesterdayPosts,
     getWeekWisePosts,
+    getPost,
+    readPost,
+    createFollowupToPost,
+    createReplyToFollowup,
+    createReplyToReply,
+    editPost,
   };
 }

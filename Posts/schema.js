@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import FollowupSchema from "../Followup/schema";
 const postSchema = new mongoose.Schema(
   {
     _id: String,
@@ -22,7 +22,7 @@ const postSchema = new mongoose.Schema(
     folder: { type: String, ref: "FolderModel" },
     summary: String,
     details: String,
-    follow_ups: [{ type: String, ref: "FollowupModel" }],
+    follow_ups: [FollowupSchema],
     timestamp: Date,
   },
   { collection: "posts" }
