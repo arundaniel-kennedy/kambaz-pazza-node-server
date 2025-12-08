@@ -10,7 +10,7 @@ export default function PazzaFolderDao() {
         if (Array.isArray(folder)) {
             const updatedFolder = folder.map(f => {
                 return {
-                    _id: uuidv4(), 
+                    _id: uuidv4(),
                     course: courseId,
                     name: f
                 }
@@ -21,8 +21,13 @@ export default function PazzaFolderDao() {
             return model.create(newFolder);
         }
     }
+    async function deleteFolders(cid, folderNames) {
+        console.log(folderNames, cid)
+        return model.deleteMany({ name: { $in: folderNames }, course: cid })
+    }
     return {
         findFoldersForCourse,
-        createFolder
+        createFolder,
+        deleteFolders
     }
 };

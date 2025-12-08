@@ -20,9 +20,14 @@ export default function PazzaFolderRoutes(app) {
                 "message": e.errorResponse
             })
         }
-
-
     }
+    const deleteFolders = async (req, res) => {
+        const { courseId } = req.params
+        const folderNames = req.body
+        const status = await dao.deleteFolders(courseId, folderNames)
+        res.sendStatus(200)
+    }
+    app.post("/api/pazza/:courseId/folders/delete", deleteFolders)
     app.post("/api/pazza/:courseId/folders", createFolderForCourse)
     app.get("/api/pazza/:courseId/folders", findFoldersForCourse)
 };
