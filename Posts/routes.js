@@ -1,12 +1,12 @@
-import PostDao from "./dao.js";
+import PostsDao from "./dao.js";
 
 export default function PostRoutes(app) {
   
-  const dao = PostDao();
+  const dao = PostsDao();
 
   const findAllPosts = async (req, res) => {
     try {
-      const posts = await dao.findAllPosts();
+      const posts = await dao.findAllPostsNameDesc();
       res.json(posts);
     } catch (error) {
       res.status(500).json({ error: error.message });

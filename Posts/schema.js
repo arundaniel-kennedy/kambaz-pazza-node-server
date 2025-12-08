@@ -1,14 +1,20 @@
 import mongoose from "mongoose";
 
-const postSchema = new mongoose.Schema({
+const postSchema = new mongoose.Schema(
+  {
     _id: String,
     post_type: {
-        type: String,
-        enum: ["QUESTION", "NOTE", "POLL"],
-        default: "QUESTION",
+      type: String,
+      enum: ["QUESTION", "NOTE", "POLL"],
+      default: "QUESTION",
     },
-    read_by: [{ type: String, ref: "UserModel" }],
-    answer:[{type:String,ref:"AnswerModel"}],
+    read_by: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserModel",
+      },
+    ],
+    answer: [{ type: String, ref: "AnswerModel" }],
     is_private: Boolean,
     is_anonymous: Boolean,
     course: { type: String, ref: "CourseModel" },
@@ -17,8 +23,8 @@ const postSchema = new mongoose.Schema({
     summary: String,
     details: String,
     follow_ups: [{ type: String, ref: "FollowupModel" }],
-    timestamp: Date
-},
-    { collection: "posts" }
+    timestamp: Date,
+  },
+  { collection: "posts" }
 );
 export default postSchema;

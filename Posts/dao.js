@@ -86,10 +86,16 @@ export default function PostsDao() {
         .toISOString()
         .slice(0, 10)} to ${actualEnd.toISOString().slice(0, 10)}`;
 
-      const weekPosts = posts.filter((p) => {
-        const ts = new Date(p.timestamp);
-        return ts >= weekStart && ts <= actualEnd;
-      });
+      const weekPosts = posts
+        .filter((p) => {
+          const ts = new Date(p.timestamp);
+          return ts >= weekStart && ts <= actualEnd;
+        })
+        .map((p) => ({
+          summary: p.summary,
+          details: p.details,
+          timestamp: p.timestamp,
+        }));
 
       weekMap[key] = weekPosts;
 
@@ -100,32 +106,33 @@ export default function PostsDao() {
 
     return weekMap;
   }
-}
 
-import { v4 as uuidv4 } from "uuid";
-import model from "./model.js";
-
-export default function PostDao(db) {
-  function findAllPosts() {
-    return model.find({}, { name: 1, description: 1 });
+  async function getViews(postId) {
+    const post = await model.findById({ _id: postId }).populate("read_by");
+    return post?.read_by?.length;
   }
 
-function createPost(posts) {
-  const newPost = { ...posts, _id: uuidv4() };
-  return model.create(newPost);
-}
+  function findAllPostsNameDesc() {
+    return model.find({}, { name: 1, description: 1 });
+  }
+  function createPost(posts) {
+    const newPost = { ...posts, _id: uuidv4() };
+    return model.create(newPost);
+  }
 
-
-function deletePost(postId) {
-   return model.deleteOne({ _id: postId });
- }
-
+  function deletePost(postId) {
+    return model.deleteOne({ _id: postId });
+  }
 
   return {
-  findAllPosts,
-  createPost,
-  deletePost,
-};
-
+    findAllPostsNameDesc,
+    createPost,
+    deletePost,
+    getViews,
+    getAllPostsForCourse,
+    getTodayPosts,
+    getLastWeekPosts,
+    getYesterdayPosts,
+    getWeekWisePosts,
+  };
 }
-
