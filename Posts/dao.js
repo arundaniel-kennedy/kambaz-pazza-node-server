@@ -133,7 +133,7 @@ export default function PostsDao() {
       throw new Error("Post not found");
     }
     const isInstr = oldPost.author.role === "FACULTY";
-    if(!isInstr || oldPost.author.toString() !== userId) {
+    if(!isInstr || oldPost.author._id !== userId) {
       throw new Error("Not authorized to edit this post");
     }
     Object.assign(oldPost, postUpdates);
@@ -225,7 +225,7 @@ export default function PostsDao() {
       throw new Error("Answer not found");
     }
     const isInstr = oldAnswer.author?.role === "FACULTY";
-    if (oldAnswer.author.toString() !== userId || !isInstr) {
+    if (oldAnswer.author._id !== userId || !isInstr) {
       throw new Error("Not authorized to edit this answer");
     }
     Object.assign(oldAnswer, answerUpdates);
