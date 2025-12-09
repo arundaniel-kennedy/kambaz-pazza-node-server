@@ -127,8 +127,21 @@ export default function PostsDao() {
   }
 
   //edit a post
-  function editPost(postId, postUpdates) {
-    return model.updateOne({ _id: postId }, { $set: postUpdates });
+  async function editPost(postId, postUpdates,userId) {
+    const oldPost = await model.findById(postId).populate("author");
+    if(!oldPost) {
+      throw new Error("Post not found");
+    }
+    const isInstr = oldPost.author.role === "FACULTY";
+    if(!isInstr || oldPost.author.toString() !== userId) {
+      throw new Error("Not authorized to edit this post");
+    }
+    Object.assign(oldPost, postUpdates);
+    oldPost.author = userId;
+    oldPost.timestamp = Date.now();
+
+    const updatedPost = await oldPost.save();
+    return updatedPost;
   }
   //get post
   function getPost(postId) {
@@ -206,8 +219,21 @@ export default function PostsDao() {
     post.save();
     return AnswerModel.create(newAnswer);
   }
-  async function editAnswer(answerId,userId,answerUpdates) {
-    return AnswerModel.updateOne({ _id: answerId }, { $set: answerUpdates });
+  async function editAnswer(answerId, userId, answerUpdates) {
+    const oldAnswer = await AnswerModel.findById(answerId).populate("author");
+    if (!oldAnswer) {
+      throw new Error("Answer not found");
+    }
+    const isInstr = oldAnswer.author?.role === "FACULTY";
+    if (oldAnswer.author.toString() !== userId || !isInstr) {
+      throw new Error("Not authorized to edit this answer");
+    }
+    Object.assign(oldAnswer, answerUpdates);
+    oldAnswer.author = userId;
+    oldAnswer.timestamp = Date.now();
+
+    const updatedAnswer = await oldAnswer.save();
+    return updatedAnswer;
   }
   return {
     findAllPostsNameDesc,
@@ -226,6 +252,6 @@ export default function PostsDao() {
     createReplyToReply,
     editPost,
     answerToPost,
-    editAnswer
+    editAnswer,
   };
 }

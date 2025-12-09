@@ -17,9 +17,8 @@ export default function PostRoutes(app) {
       userID = req.session["currentUser"];
       if (userId === null) res.status(401).json({ error: "User not found" });
       const newPost = req.body;
-      newPostWithUserId = { ...newPost, _id: userId };
+      newPostWithUserId = { ...newPost, author: userId };
       const response = await dao.createPost(newPostWithUserId);
-
       res.status(201).json(response);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -41,7 +40,7 @@ export default function PostRoutes(app) {
 
   const getAllPostsForCourse = async (req, res) => {
     try {
-      const posts = await dao.findAllPostsNameDesc();
+      const posts = await dao.getAllPostsForCourse();
       res.json(posts);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -111,7 +110,11 @@ export default function PostRoutes(app) {
     try {
       const { postId } = req.params;
       const postUpdates = req.body;
-      const post = await dao.editPost(postId, postUpdates);
+      const userId = req.session["currentUser"]._id;
+      if (userId === null) {
+        res.status(401).json({ error: "User not found" });
+      }
+      const post = await dao.editPost(postId, postUpdates,userId);
       res.json(post);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -121,7 +124,7 @@ export default function PostRoutes(app) {
   const readPost = async (req, res) => {
     try {
       const { postId } = req.params;
-      userId = req.session["currentUser"]._id;
+      const userId = req.session["currentUser"]._id;
       if (userId === null) {
         res.status(401).json({ error: "User not found" });
       }
@@ -134,9 +137,10 @@ export default function PostRoutes(app) {
 
   const createReplyToFollowup = async (req, res) => {
     try {
-      const { postId, followupId, userId } = req.params;
-      if (userId === "current") {
-        userId = req.session["currentUser"]._id;
+      const { postId, followupId } = req.params;
+      const userId = req.session["currentUser"]._id;
+      if (userId === null) {
+        res.status(401).json({ error: "User not found" });
       }
       const reply = req.body;
       const response = await dao.createReplyToFollowup(
@@ -153,14 +157,16 @@ export default function PostRoutes(app) {
 
   const createReplyToReply = async (req, res) => {
     try {
-      const { postId, followupId, userId } = req.params;
-      if (userId === "current") {
-        userId = req.session["currentUser"]._id;
+      const { postId, followupId ,replyId } = req.params;
+      const userId = req.session["currentUser"]._id;
+      if (userId === null) {
+        res.status(401).json({ error: "User not found" });
       }
       const reply = req.body;
       const response = await dao.createReplyToReply(
         postId,
         followupId,
+        replyId,
         userId,
         reply
       );
@@ -172,9 +178,10 @@ export default function PostRoutes(app) {
 
   const createFollowupToPost = async (req, res) => {
     try {
-      const { postId, followupId, userId } = req.params;
-      if (userId === "current") {
-        userId = req.session["currentUser"]._id;
+      const { postId } = req.params;
+      const userId = req.session["currentUser"]._id;
+      if (userId === null) {
+        res.status(401).json({ error: "User not found" });
       }
       const followup = req.body;
       const response = await dao.createFollowupToPost(postId, userId, followup);
@@ -186,12 +193,13 @@ export default function PostRoutes(app) {
 
   const answerToPost = async (req, res) => {
     try {
-      const { postId, userId } = req.params;
-      if (userId === "current") {
-        userId = req.session["currentUser"]._id;
+      const { postId } = req.params;
+      const userId = req.session["currentUser"]._id;
+      if (userId === null) {
+        res.status(401).json({ error: "User not found" });
       }
       const answer = req.body;
-      const response = await dao.createFollowupToPost(postId, userId, answer);
+      const response = await dao.answerToPost(postId, userId, answer);
       res.json(response);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -200,9 +208,10 @@ export default function PostRoutes(app) {
 
   const editAnswer = async (req, res) => {
     try {
-      const { answerId, userId } = req.params;
-      if (userId === "current") {
-        userId = req.session["currentUser"]._id;
+      const { answerId } = req.params;
+      const userId = req.session["currentUser"]._id;
+      if (userId === null) {
+        res.status(401).json({ error: "User not found" });
       }
       const answer = req.body;
       const response = await dao.editAnswer(answerId, userId, answer);
