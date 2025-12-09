@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import model from "./model.js";
 import UserModel from "../../Kambaz/Users/model.js";
+import AnswerModel from "../Answers/model.js";
 export default function PostsDao() {
   async function getAllPostsForCourse(courseId) {
-    return await model.find({ course: courseId });
+    return await model.find({ course: courseId }).populate("author");
   }
 
   async function getTodayPosts(courseId) {
@@ -189,14 +190,25 @@ export default function PostsDao() {
     return newReplyWithId;
   }
   //followup
-  async function createFollowupToPost(postId,userId, followup) {
+  async function createFollowupToPost(postId, userId, followup) {
     const post = await model.findById(postId);
-    const newFollowup = { ...followup, _id: uuidv4(),author:userId };
+    const newFollowup = { ...followup, _id: uuidv4(), author: userId };
     post.follow_ups.push(newFollowup);
     await post.save();
     return newFollowup;
   }
 
+  //answers
+  async function answerToPost(postId, userId, answer) {
+    const post = await model.findById(postId);
+    const newAnswer = { ...answer, _id: uuidv4(), author: userId };
+    post.answer.push(newAnswer._id);
+    post.save();
+    return AnswerModel.create(newAnswer);
+  }
+  async function editAnswer(answerId,userId,answerUpdates) {
+    return AnswerModel.updateOne({ _id: answerId }, { $set: answerUpdates });
+  }
   return {
     findAllPostsNameDesc,
     createPost,
@@ -213,5 +225,7 @@ export default function PostsDao() {
     createReplyToFollowup,
     createReplyToReply,
     editPost,
+    answerToPost,
+    editAnswer
   };
 }

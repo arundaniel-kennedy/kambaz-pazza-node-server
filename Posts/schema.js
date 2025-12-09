@@ -23,7 +23,7 @@ const postSchema = new mongoose.Schema(
     summary: String,
     details: String,
     follow_ups: [FollowupSchema],
-    timestamp: Date,
+    timestamp: { type: Date, default: Date.now },
   },
   { collection: "posts" }
 );
