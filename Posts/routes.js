@@ -40,7 +40,8 @@ export default function PostRoutes(app) {
 
   const getAllPostsForCourse = async (req, res) => {
     try {
-      const posts = await dao.getAllPostsForCourse();
+      const { courseId } = req.params
+      const posts = await dao.getAllPostsForCourse(courseId);
       res.json(posts);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -114,7 +115,7 @@ export default function PostRoutes(app) {
       if (userId === null) {
         res.status(401).json({ error: "User not found" });
       }
-      const post = await dao.editPost(postId, postUpdates,userId);
+      const post = await dao.editPost(postId, postUpdates, userId);
       res.json(post);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -157,7 +158,7 @@ export default function PostRoutes(app) {
 
   const createReplyToReply = async (req, res) => {
     try {
-      const { postId, followupId ,replyId } = req.params;
+      const { postId, followupId, replyId } = req.params;
       const userId = req.session["currentUser"]._id;
       if (userId === null) {
         res.status(401).json({ error: "User not found" });

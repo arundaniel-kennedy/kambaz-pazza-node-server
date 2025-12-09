@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import FollowupSchema from "../Followup/schema";
+import FollowupSchema from "../Followup/schema.js";
+
 const postSchema = new mongoose.Schema(
   {
     _id: String,
@@ -10,7 +11,7 @@ const postSchema = new mongoose.Schema(
     },
     read_by: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: "UserModel",
       },
     ],

@@ -22,8 +22,10 @@ export default function PazzaFolderDao() {
         }
     }
     async function deleteFolders(cid, folderNames) {
-        console.log(folderNames, cid)
         return model.deleteMany({ name: { $in: folderNames }, course: cid })
+    }
+    async function editFolder(cid, folder) {
+        
     }
     return {
         findFoldersForCourse,

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import ReplySchema from "../Replies/schema";
+import ReplySchema from "../Replies/schema.js";
+
 const FollowupSchema = new mongoose.Schema({
     _id: String,
     author: { type: String, ref: "UserModel" },
