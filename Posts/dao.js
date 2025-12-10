@@ -144,19 +144,19 @@ export default function PostsDao() {
     return updatedPost;
   }
   //get post
-  function getPost(postId) {
-    return model
+  async function getPost(postId) {
+    const post = await model
       .findById(postId)
       .populate("author")
-      .populate("answer")
-      .populate("folder");
+      .populate("answer");
+      return post;
   }
 
   //record a view
   async function readPost(postId, userId) {
     const post = await model.findById(postId).populate("read_by");
     const alreadyRead = post.read_by.some((user) => user._id === userId);
-    const user = UserModel.findById(userId);
+    const user = await UserModel.findById(userId);
     if (!alreadyRead) {
       post.read_by.push(user);
       await post.save();
