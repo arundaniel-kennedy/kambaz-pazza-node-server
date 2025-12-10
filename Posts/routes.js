@@ -234,12 +234,12 @@ export default function PostRoutes(app) {
   app.get("/api/pazza/posts/:postId", getPost);
   app.put("/api/pazza/posts/:postId", editPost);
   app.put("/api/pazza/posts/views/:postId", readPost);
-  app.put("/api/pazza/posts/reply/:postId/:followupId", createReplyToFollowup);
+  app.post("/api/pazza/posts/reply/:postId/:followupId", createReplyToFollowup);
   app.put(
     "/api/pazza/posts/reply/:postId/:followupId/:replyId",
     createReplyToReply
   );
-  app.put("/api/pazza/posts/followup/:postId", createFollowupToPost);
+  app.post("/api/pazza/posts/followup/:postId", createFollowupToPost);
   app.post("/api/pazza/posts/answer/:postId", answerToPost);
   app.put("/api/pazza/posts/answer/:answerId", editAnswer);
 }
