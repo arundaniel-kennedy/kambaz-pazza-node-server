@@ -4,7 +4,7 @@ import UserModel from "../../Kambaz/Users/model.js";
 import AnswerModel from "../Answers/model.js";
 export default function PostsDao() {
   async function getAllPostsForCourse(courseId) {
-    return await model.find({ course: courseId }).populate("author");
+    return await model.find({ course: courseId }).sort({ timestamp: -1 }).populate("author");
   }
 
   async function getTodayPosts(courseId) {
