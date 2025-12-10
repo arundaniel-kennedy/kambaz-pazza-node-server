@@ -1,6 +1,7 @@
 import ReplyDao from "./dao.js"
 
 export default function ReplyRoutes(app) {
+    const dao = ReplyDao();
     const createReplyToFollowup = async (req, res) => {
         try {
             const { postId, followupId } = req.params;
@@ -43,7 +44,7 @@ export default function ReplyRoutes(app) {
     };
 
     app.post("/api/pazza/posts/:postId/followup/:followupId/reply", createReplyToFollowup);
-    app.put(
+    app.post(
         "/api/pazza/posts/:postId/followup/:followupId/reply/:replyId",
         createReplyToReply
     );
