@@ -4,7 +4,11 @@ import UserModel from "../../Kambaz/Users/model.js";
 import AnswerModel from "../Answers/model.js";
 export default function PostsDao() {
   async function getAllPostsForCourse(courseId) {
-    return await model.find({ course: courseId }).sort({ timestamp: -1 }).populate("author");
+    return await model
+      .find({ course: courseId })
+      .sort({ timestamp: -1 })
+      .populate("author")
+      .populate("folder")
   }
 
   async function getTodayPosts(courseId) {
@@ -127,13 +131,13 @@ export default function PostsDao() {
   }
 
   //edit a post
-  async function editPost(postId, postUpdates,userId) {
+  async function editPost(postId, postUpdates, userId) {
     const oldPost = await model.findById(postId).populate("author");
-    if(!oldPost) {
+    if (!oldPost) {
       throw new Error("Post not found");
     }
     const isInstr = oldPost.author.role === "FACULTY";
-    if(!isInstr || oldPost.author._id !== userId) {
+    if (!isInstr || oldPost.author._id !== userId) {
       throw new Error("Not authorized to edit this post");
     }
     Object.assign(oldPost, postUpdates);
@@ -148,8 +152,9 @@ export default function PostsDao() {
     const post = await model
       .findById(postId)
       .populate("author")
-      .populate("answer");
-      return post;
+      .populate({ path: 'student_answer.author', model: UserModel })
+      .populate({ path: 'instructor_answer.author', model: UserModel })
+    return post;
   }
 
   //record a view
