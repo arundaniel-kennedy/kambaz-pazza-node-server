@@ -1,4 +1,4 @@
 import mongoose from "mongoose";
 import schema from "./schema.js";
-const model = mongoose.model("PazzaFolderModel", schema);
+const model = mongoose.model("FolderModel", schema);
 export default model;
