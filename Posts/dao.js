@@ -132,10 +132,6 @@ export default function PostsDao() {
     if(!oldPost) {
       throw new Error("Post not found");
     }
-    const isInstr = oldPost.author.role === "FACULTY";
-    if(!isInstr || oldPost.author._id !== userId) {
-      throw new Error("Not authorized to edit this post");
-    }
     Object.assign(oldPost, postUpdates);
     oldPost.author = userId;
     oldPost.timestamp = Date.now();
