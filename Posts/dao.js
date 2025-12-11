@@ -57,8 +57,13 @@ export default function PostsDao() {
 
   //record a view
   async function readPost(postId, userId) {
-    const post = await model.findById(postId).populate("read_by");
-    const alreadyRead = post.read_by.some((user) => user._id === userId);
+    const post = await model.findById(postId);
+    let alreadyRead = false
+    if (post?.read_by) {
+      alreadyRead = post.read_by.some((user) => user._id === userId);
+    } else {
+      post.read_by = []
+    }
     const user = await UserModel.findById(userId);
     if (!alreadyRead) {
       post.read_by.push(user);

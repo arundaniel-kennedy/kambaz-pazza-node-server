@@ -21,6 +21,7 @@ export default function PostRoutes(app) {
             const post = await dao.getPost(postId);
             res.json(post);
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error: error.message });
         }
     };
@@ -32,7 +33,7 @@ export default function PostRoutes(app) {
                 return res.status(401).json({ error: "User not found" });
             }
             const newPost = req.body;
-            const newPostWithUserId = { ...newPost, author: userId };
+            const newPostWithUserId = { ...newPost, author: userId, folder: newPost.folder.name };
             const response = await dao.createPost(newPostWithUserId);
             res.status(201).json(response);
         } catch (error) {
