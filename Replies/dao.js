@@ -1,5 +1,5 @@
-import model from "../Posts/model.js"
-import ReplyModel from "./model.js"
+import model from "../Posts/model.js";
+import ReplyModel from "./model.js";
 import { v4 as uuidv4 } from "uuid";
 export default function ReplyDao() {
     async function createReplyToFollowup(postId, followupId, userId, reply) {
@@ -17,9 +17,32 @@ export default function ReplyDao() {
     async function createReplyToReply(
         postId,
         followupId,
-        replyId,
+        parentReplyId,
         userId,
         newReply
+    ) {
+        const post = await model.findById(postId);
+        if (!post) throw new Error("Post not found");
+        const followup = post.follow_ups.id(followupId);
+        if (!followup) throw new Error("Followup not found");
+
+        const parentReply = followup.replies.id(parentReplyId);
+        if (!parentReply) throw new Error("Reply not found");
+
+        const newReplyWithId = { ...newReply, _id: uuidv4(), author: userId };
+        const createdReply = await ReplyModel.create(newReplyWithId);
+        parentReply.replies.push(createdReply);
+
+        await post.save();
+
+        return createdReply;
+    }
+    async function editReplyToFollowup(
+        postId,
+        followupId,
+        replyId,
+        userId,
+        replyUpdates
     ) {
         const post = await model.findById(postId);
         if (!post) throw new Error("Post not found");
@@ -29,17 +52,39 @@ export default function ReplyDao() {
         const reply = followup.replies.id(replyId);
         if (!reply) throw new Error("Reply not found");
 
-        const newReplyWithId = { ...newReply, _id: uuidv4(), author: userId };
-        const createdReply = await ReplyModel.create(newReplyWithId);
-        reply.replies.push(createdReply);
-
+        Object.assign(reply, replyUpdates, { author: userId });
         await post.save();
+        return reply;
+    }
 
-        return createdReply;
+    async function editReplyToReply(
+        postId,
+        followupId,
+        parentReplyId,
+        replyId,
+        userId,
+        replyUpdates
+    ) {
+        const post = await model.findById(postId);
+        if (!post) throw new Error("Post not found");
+        const followup = post.follow_ups.id(followupId);
+        if (!followup) throw new Error("Followup not found");
+
+        const parentReply = followup.replies.id(parentReplyId);
+        if (!parentReply) throw new Error("Parent reply not found");
+
+        const reply = parentReply.replies.id(replyId);
+        if (!reply) throw new Error("Reply-to-reply not found");
+
+        Object.assign(reply, replyUpdates, { author: userId });
+        await post.save();
+        return reply;
     }
 
     return {
         createReplyToFollowup,
         createReplyToReply,
-    }
-};
+        editReplyToFollowup,
+        editReplyToReply
+    };
+}
