@@ -43,8 +43,8 @@ export default function PazzaFolderRoutes(app) {
     }
 
     const getPostsBasedOnFolderFilter = async (req, res) => {
-        const { folderName } = req.params;
-        const posts = await dao.findPostsBasedOnFolderFilter(folderName);
+        const { folderId } = req.params;
+        const posts = await dao.findPostsBasedOnFolderFilter(folderId);
         res.json(posts);
     }
 

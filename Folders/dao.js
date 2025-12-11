@@ -29,8 +29,8 @@ export default function PazzaFolderDao() {
         return model.deleteMany({ name: { $in: folderNames }, course: cid })
     }
 
-    function findPostsBasedOnFolderFilter(folderName) {
-        return PostModel.find({ folder: folderName });
+    function findPostsBasedOnFolderFilter(folderId) {
+        return PostModel.find({ folder: folderId });
     }
 
     function getAllFolders() {

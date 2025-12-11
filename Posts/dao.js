@@ -12,6 +12,14 @@ export default function PostsDao() {
       .populate("folder")
   }
 
+  function getPostsForFolder(folderId) {
+    return model
+      .find({ folder: folderId })
+      .sort({ timestamp: -1 })
+      .populate("author")
+      .populate("folder")
+  }
+
   async function getPost(postId) {
     
     const post= await model
@@ -62,6 +70,7 @@ export default function PostsDao() {
 
   return {
     getAllPostsForCourse,
+    getPostsForFolder,
     getPost,
     readPost,
     createPost,
