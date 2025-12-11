@@ -16,6 +16,7 @@ export default function PostsDao() {
     return model
       .findById(postId)
       .populate("author")
+      .populate("folder")
       .populate({ path: 'student_answer.author', model: UserModel })
       .populate({ path: 'instructor_answer.author', model: UserModel })
   }
