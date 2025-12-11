@@ -41,8 +41,22 @@ export default function PazzaFolderRoutes(app) {
         const status = await dao.deleteFolders(courseId, folderNames)
         res.sendStatus(200)
     }
+
+    const getPostsBasedOnFolderFilter = async (req, res) => {
+        const { folderName } = req.params;
+        const posts = await dao.findPostsBasedOnFolderFilter(folderName);
+        res.json(posts);
+    }
+
+    const getAllFolders = async (req, res) => {
+        const folders = await dao.getAllFolders();
+        res.json(folders);
+    }
+
     app.put("/api/pazza/:courseId/folders/:folderId", updateFolderName)
     app.put("/api/pazza/:courseId/folders/delete", deleteFolders)
     app.post("/api/pazza/:courseId/folders", createFolderForCourse)
     app.get("/api/pazza/:courseId/folders", findFoldersForCourse)
+    app.get("/api/pazza/:courseId/folders/:folderId", getPostsBasedOnFolderFilter)
+    app.get("/api/pazza/folders", getAllFolders)
 };
