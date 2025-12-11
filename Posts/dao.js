@@ -28,8 +28,8 @@ export default function PostsDao() {
       .populate("student_answer")
       .populate("instructor_answer")
 
-    post.student_answer.author = await UserModel.findOne({ _id: post.student_answer.author })
-    post.instructor_answer.author = await UserModel.findOne({ _id: post.instructor_answer.author })
+    if (post?.student_answer) post.student_answer.author = await UserModel.findOne({ _id: post.student_answer.author })
+    if (post?.instructor_answer) post.instructor_answer.author = await UserModel.findOne({ _id: post.instructor_answer.author })
     return post
   }
 

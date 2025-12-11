@@ -16,6 +16,8 @@ export default function PostRoutes(app) {
     const getPost = async (req, res) => {
         try {
             const { postId } = req.params;
+            const userId = req.session["currentUser"]._id
+            await dao.readPost(postId, userId)
             const post = await dao.getPost(postId);
             res.json(post);
         } catch (error) {
