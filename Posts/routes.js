@@ -25,10 +25,12 @@ export default function PostRoutes(app) {
 
     const createPost = async (req, res) => {
         try {
-            userID = req.session["currentUser"];
-            if (userId === null) res.status(401).json({ error: "User not found" });
+            const userId = req.session["currentUser"]?._id;
+            if (!userId) {
+                return res.status(401).json({ error: "User not found" });
+            }
             const newPost = req.body;
-            newPostWithUserId = { ...newPost, author: userId };
+            const newPostWithUserId = { ...newPost, author: userId };
             const response = await dao.createPost(newPostWithUserId);
             res.status(201).json(response);
         } catch (error) {

@@ -12,12 +12,15 @@ export default function PostsDao() {
       .populate("folder")
   }
 
-  function getPost(postId) {
-    return model
+  async function getPost(postId) {
+    
+    const post= await model
       .findById(postId)
       .populate("author")
       .populate({ path: 'student_answer.author', model: UserModel })
       .populate({ path: 'instructor_answer.author', model: UserModel })
+    
+      return post;
   }
 
   function createPost(posts) {
