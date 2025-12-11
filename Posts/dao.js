@@ -12,13 +12,24 @@ export default function PostsDao() {
       .populate("folder")
   }
 
-  function getPost(postId) {
+  function getPostsForFolder(folderId) {
     return model
+      .find({ folder: folderId })
+      .sort({ timestamp: -1 })
+      .populate("author")
+      .populate("folder")
+  }
+
+  async function getPost(postId) {
+    
+    const post= await model
       .findById(postId)
       .populate("author")
       .populate("folder")
       .populate({ path: 'student_answer.author', model: UserModel })
       .populate({ path: 'instructor_answer.author', model: UserModel })
+    
+      return post;
   }
 
   function createPost(posts) {
@@ -60,6 +71,7 @@ export default function PostsDao() {
 
   return {
     getAllPostsForCourse,
+    getPostsForFolder,
     getPost,
     readPost,
     createPost,

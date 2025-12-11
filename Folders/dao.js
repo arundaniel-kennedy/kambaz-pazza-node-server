@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import model from "./model.js";
 import CourseModel from "../../Kambaz/Courses/model.js"
+import PostModel from "../Posts/model.js";
 
 export default function PazzaFolderDao() {
     function findFoldersForCourse(courseId) {
@@ -27,10 +28,21 @@ export default function PazzaFolderDao() {
     function deleteFolders(cid, folderNames) {
         return model.deleteMany({ name: { $in: folderNames }, course: cid })
     }
+
+    function findPostsBasedOnFolderFilter(folderId) {
+        return PostModel.find({ folder: folderId });
+    }
+
+    function getAllFolders() {
+        return model.find({});
+    }
+    
     return {
         findFoldersForCourse,
         createFolder,
         deleteFolders,
-        updateFolderName
+        updateFolderName,
+        findPostsBasedOnFolderFilter,
+        getAllFolders
     }
 };
