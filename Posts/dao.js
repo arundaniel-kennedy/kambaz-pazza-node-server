@@ -21,15 +21,16 @@ export default function PostsDao() {
   }
 
   async function getPost(postId) {
-    
-    const post= await model
+    const post = await model
       .findById(postId)
       .populate("author")
       .populate("folder")
-      .populate({ path: 'student_answer.author', model: UserModel })
-      .populate({ path: 'instructor_answer.author', model: UserModel })
-    
-      return post;
+      .populate("student_answer")
+      .populate("instructor_answer")
+
+    post.student_answer.author = await UserModel.findOne({ _id: post.student_answer.author })
+    post.instructor_answer.author = await UserModel.findOne({ _id: post.instructor_answer.author })
+    return post
   }
 
   function createPost(posts) {
