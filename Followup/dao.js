@@ -17,7 +17,7 @@ export default function FollowupDao() {
         const followup = post.follow_ups.id(followupId);
 
         Object.assign(followup, followupUpdates, {
-            author: userId,
+            updated_by: userId,
             timestamp: Date.now(),
         });
         await post.save();

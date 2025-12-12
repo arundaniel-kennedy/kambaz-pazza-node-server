@@ -7,15 +7,15 @@ export default function PostsDao() {
   function getAllPostsForCourse(courseId, userId) {
     return model
       .find({
-            course: courseId,
-            $or: [
-              { audience: { $exists: false } },   
-              { audience: { $size: 0 } },        
-              { audience: "ALL" },                
-              { audience: userId },               
-              { author: userId },                 
-            ],
-          })
+        course: courseId,
+        $or: [
+          { audience: { $exists: false } },
+          { audience: { $size: 0 } },
+          { audience: "ALL" },
+          { audience: userId },
+          { author: userId },
+        ],
+      })
       .sort({ timestamp: -1 })
       .populate("author")
       .populate("folder");
@@ -23,15 +23,16 @@ export default function PostsDao() {
 
   function getPostsForFolder(folderId, userId) {
     return model
-      .find({ folder: folderId,
+      .find({
+        folder: folderId,
         $or: [
-              { audience: { $exists: false } },   
-              { audience: { $size: 0 } },        
-              { audience: "ALL" },                
-              { audience: userId },               
-              { author: userId },                 
-            ],
-       })
+          { audience: { $exists: false } },
+          { audience: { $size: 0 } },
+          { audience: "ALL" },
+          { audience: userId },
+          { author: userId },
+        ],
+      })
       .sort({ timestamp: -1 })
       .populate("author")
       .populate("folder")
@@ -42,11 +43,33 @@ export default function PostsDao() {
       .findById(postId)
       .populate("author")
       .populate("folder")
+      .populate("follow_ups.author")
       .populate("student_answer")
       .populate("instructor_answer")
 
     if (post?.student_answer) post.student_answer.author = await UserModel.findOne({ _id: post.student_answer.author })
     if (post?.instructor_answer) post.instructor_answer.author = await UserModel.findOne({ _id: post.instructor_answer.author })
+    if (post?.follow_ups) {
+      const populateThreads = async (replies) => {
+        if (!replies || replies.length === 0) return;
+
+        for (const reply of replies) {
+          if (reply.author) {
+            reply.author = await UserModel.findOne({ _id: reply.author });
+          }
+
+          if (reply.replies && reply.replies.length > 0) {
+            await populateThreads(reply.replies);
+          }
+        }
+      };
+
+      for (const followup of post.follow_ups) {
+        if (followup.replies) {
+          await populateThreads(followup.replies);
+        }
+      }
+    }
     return post
   }
 
