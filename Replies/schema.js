@@ -11,7 +11,7 @@ const replySchema = new mongoose.Schema({
       author: { type: String, ref: "UserModel" },
       details: String,
       timestamp: { type: Date, default: Date.now },
-      replies: [Object],
+      replies: [],
     },
   ],
 });

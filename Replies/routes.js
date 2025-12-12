@@ -85,6 +85,60 @@ export default function ReplyRoutes(app) {
             res.status(401).json({ error: error.message });
         }
     };
+
+    const deleteReplyToReply = async (req, res) => {
+        try {
+            const { postId, followupId, parentReplyId, replyId } = req.params;
+            const userId = req.session["currentUser"]._id;
+
+            if (userId === null) {
+                res.status(401).json({ error: "User not found" });
+                return;
+            }
+
+            const response = await dao.deleteReplyToReply(
+                postId,
+                followupId,
+                parentReplyId,
+                replyId,
+                userId
+            );
+
+            res.json(response);
+        } catch (error) {
+            res.status(401).json({ error: error.message });
+        }
+    };
+    const deleteReplyToFollowup = async (req, res) => {
+        try {
+            const { postId, followupId, replyId } = req.params;
+            const userId = req.session["currentUser"]._id;
+
+            if (userId === null) {
+                res.status(401).json({ error: "User not found" });
+                return;
+            }
+
+            const response = await dao.deleteReplyToFollowup(
+                postId,
+                followupId,
+                replyId,
+                userId
+            );
+
+            res.json(response);
+        } catch (error) {
+            res.status(401).json({ error: error.message });
+        }
+    };
+    app.delete(
+        "/api/pazza/posts/:postId/followup/:followupId/reply/:replyId",
+        deleteReplyToFollowup
+    );
+    app.delete(
+        "/api/pazza/posts/:postId/followup/:followupId/reply/:parentReplyId/:replyId",
+        deleteReplyToReply
+    );
     app.put(
         "/api/pazza/posts/:postId/followup/:followupId/reply/:parentReplyId/:replyId",
         editReplyToReply

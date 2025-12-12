@@ -41,7 +41,28 @@ export default function FollowupRoutes(app) {
             res.status(401).json({ error: error.message });
         }
     };
+    const deleteFollowup = async (req, res) => {
+        try {
+            const { postId, followupId } = req.params;
+            const userId = req.session["currentUser"]._id;
 
+            if (userId === null) {
+                res.status(401).json({ error: "User not found" });
+                return;
+            }
+
+            const response = await dao.deleteFollowup(
+                postId,
+                followupId
+            );
+
+            res.json(response);
+        } catch (error) {
+            res.status(401).json({ error: error.message });
+        }
+    };
+
+    app.delete("/api/pazza/posts/:postId/followup/:followupId",deleteFollowup);
     app.put("/api/pazza/posts/:postId/followup/:followupId", editFollowup);
     app.post("/api/pazza/posts/:postId/followup", createFollowupToPost);
 }

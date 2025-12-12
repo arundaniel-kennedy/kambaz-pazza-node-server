@@ -15,14 +15,33 @@ export default function FollowupDao() {
     async function editFollowup(postId, userId, followupId, followupUpdates) {
         const post = await model.findById(postId);
         const followup = post.follow_ups.id(followupId);
-        followup.author = userId;
-        Object.assign(followup, followupUpdates);
+
+        Object.assign(followup, followupUpdates, {
+            author: userId,
+            timestamp: Date.now(),
+        });
         await post.save();
+        console.log("followup edited", followup);
         return followup;
+    }
+
+    async function deleteFollowup(postId, followupId) {
+        const post = await model.findById(postId);
+        if (!post) throw new Error("Post not found");
+
+        const followup = post.follow_ups.id(followupId);
+        if (!followup) throw new Error("Followup not found");
+
+        followup.deleteOne();
+        await post.save();
+
+        console.log("followup deleted", followupId);
+        return { message: "Followup deleted successfully" };
     }
 
     return {
         createFollowupToPost,
         editFollowup,
+        deleteFollowup,
     };
 }
