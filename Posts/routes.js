@@ -5,8 +5,9 @@ export default function PostRoutes(app) {
 
     const getAllPostsForCourse = async (req, res) => {
         try {
-            const { courseId } = req.params
-            const posts = await dao.getAllPostsForCourse(courseId);
+    const { courseId } = req.params;
+    const userId = req.session["currentUser"]._id;
+    const posts = await dao.getAllPostsForCourse(courseId, userId);
             res.json(posts);
         } catch (error) {
             res.status(500).json({ error: error.message });

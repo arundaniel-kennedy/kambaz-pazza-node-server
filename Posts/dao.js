@@ -4,12 +4,21 @@ import UserModel from "../../Kambaz/Users/model.js";
 import AnswerModel from "../Answers/model.js";
 
 export default function PostsDao() {
-  function getAllPostsForCourse(courseId) {
+  function getAllPostsForCourse(courseId, userId) {
     return model
-      .find({ course: courseId })
+      .find({
+            course: courseId,
+            $or: [
+              { audience: { $exists: false } },   
+              { audience: { $size: 0 } },        
+              { audience: "ALL" },                
+              { audience: userId },               
+              { author: userId },                 
+            ],
+          })
       .sort({ timestamp: -1 })
       .populate("author")
-      .populate("folder")
+      .populate("folder");
   }
 
   function getPostsForFolder(folderId) {
