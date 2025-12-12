@@ -43,9 +43,17 @@ export default function PazzaFolderRoutes(app) {
     }
 
     const getPostsBasedOnFolderFilter = async (req, res) => {
-        const { folderId } = req.params;
-        const posts = await dao.findPostsBasedOnFolderFilter(folderId);
-        res.json(posts);
+        try {
+            const { folderId } = req.params;
+            const userId = req.session["currentUser"]?._id;
+            if (!userId) {
+                return res.status(401).json({ error: "User not found" });
+            }
+            const posts = await dao.findPostsBasedOnFolderFilter(folderId, userId);
+            res.json(posts);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 
     const getAllFolders = async (req, res) => {

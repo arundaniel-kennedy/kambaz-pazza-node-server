@@ -21,9 +21,17 @@ export default function PostsDao() {
       .populate("folder");
   }
 
-  function getPostsForFolder(folderId) {
+  function getPostsForFolder(folderId, userId) {
     return model
-      .find({ folder: folderId })
+      .find({ folder: folderId,
+        $or: [
+              { audience: { $exists: false } },   
+              { audience: { $size: 0 } },        
+              { audience: "ALL" },                
+              { audience: userId },               
+              { author: userId },                 
+            ],
+       })
       .sort({ timestamp: -1 })
       .populate("author")
       .populate("folder")
