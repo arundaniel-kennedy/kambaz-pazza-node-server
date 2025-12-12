@@ -35,21 +35,40 @@ export default function AnswerRoutes(app) {
         try {
             const { answerId } = req.params;
             const currentUser = req.session["currentUser"];
-            console.log(currentUser)
-            const userId = currentUser._id
-            if (userId === null) {
+            if (currentUser === null) {
                 res.status(401).json({ error: "User not found" });
             }
             const answer = req.body;
-            const response = await dao.editAnswer(answerId, userId, answer);
+            const response = await dao.editAnswer(answerId, currentUser, answer);
             res.json(response);
         } catch (error) {
             console.log(error)
             res.status(500).json({ error: error.message });
         }
     };
-
+    const deleteStudentAnswer = async (req, res) => {
+        try {
+            const { answerId, postId } = req.params;
+            const response = await dao.deleteStudentAnswer(postId, answerId);
+            res.json(response);
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: error.message });
+        }
+    }
+    const deleteInstructorAnswer = async (req, res) => {
+        try {
+            const { answerId, postId } = req.params;
+            const response = await dao.deleteStudentAnswer(postId, answerId);
+            res.json(response);
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: error.message });
+        }
+    }
     app.post("/api/pazza/posts/:postId/student_answer", studentAnswerToPost);
     app.post("/api/pazza/posts/:postId/instructor_answer", instructorAnswerToPost);
     app.put("/api/pazza/posts/answer/:answerId", editAnswer);
+    app.delete("/api/pazza/posts/:postId/student_answer/:answerId", deleteStudentAnswer);
+    app.delete("/api/pazza/posts/:postId/instructor_answer/:answerId", deleteInstructorAnswer);
 };

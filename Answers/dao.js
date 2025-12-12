@@ -19,26 +19,39 @@ export default function AnswerDao() {
         const createdAnswer = await AnswerModel.create(newAnswer);
         return createdAnswer.populate("author")
     }
-    async function editAnswer(answerId, userId, answerUpdates) {
+    async function editAnswer(answerId, currentUser, answerUpdates) {
         const oldAnswer = await AnswerModel.findById(answerId).populate("author");
         if (!oldAnswer) {
             throw new Error("Answer not found");
         }
-        const isInstr = oldAnswer.author?.role === "FACULTY";
-        if (oldAnswer.author._id !== userId || !isInstr) {
+        const isInstr = ["FACULTY", "TA"].includes(currentUser.role);
+        if (oldAnswer.author._id !== currentUser._id && !isInstr) {
             throw new Error("Not authorized to edit this answer");
         }
         Object.assign(oldAnswer, answerUpdates);
-        oldAnswer.author = userId;
+        oldAnswer.author = currentUser._id;
         oldAnswer.timestamp = Date.now();
 
         const updatedAnswer = await oldAnswer.save();
         return updatedAnswer.populate("author");
     }
-
+    async function deleteStudentAnswer(postId, answerId) {
+        const post = await model.findOne({ _id: postId })
+        post.student_answer = null
+        await post.save()
+        return AnswerModel.deleteOne({ _id: answerId })
+    }
+    async function deleteInstructorAnswer(postId, answerId) {
+        const post = await model.findOne({ _id: postId })
+        post.instructor_answer = null
+        await post.save()
+        return AnswerModel.deleteOne({ _id: answerId })
+    }
     return {
         studentAnswerToPost,
         instructorAnswerToPost,
         editAnswer,
+        deleteStudentAnswer,
+        deleteInstructorAnswer
     }
 };

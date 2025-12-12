@@ -60,7 +60,7 @@ export default function PostsDao() {
     const post = await model.findById(postId);
     let alreadyRead = false
     if (post?.read_by) {
-      alreadyRead = post.read_by.some((user) => user._id === userId);
+      alreadyRead = post.read_by.includes(userId);
     } else {
       post.read_by = []
     }
