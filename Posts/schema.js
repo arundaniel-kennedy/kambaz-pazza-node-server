@@ -26,6 +26,12 @@ const postSchema = new mongoose.Schema(
     details: String,
     follow_ups: [FollowupSchema],
     timestamp: { type: Date, default: Date.now },
+    audience: [
+      {
+        type: String,
+        ref: "UserModel",
+      },
+    ],
   },
   { collection: "posts" }
 );
